@@ -1,7 +1,7 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 
-const About = () => {
+const About = () => {   
   return (
     <div>
         <div className='text-center text-2xl pt-10 text-gray-500'>
