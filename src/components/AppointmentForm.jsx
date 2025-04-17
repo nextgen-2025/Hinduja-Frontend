@@ -21,7 +21,23 @@ const AppointmentForm = () => {
     { value: "4", label: "Pediatric" },
     { value: "5", label: "Cardiology" },
     { value: "6", label: "Psychiatry" },
+    { value: "7", label: "Other" }
   ];
+  const doctorData = [
+    { value: "0", label: "Select Doctor" },
+    { value: "1", label: "Dr. Sarah Johnson" },
+    { value: "2", label: "Dr. Michael Chen" },
+    { value: "3", label: "Dr. Emily Rodriguez" },
+    { value: "4", label: "Dr. James Wilson" },
+    { value: "5", label: "Dr. Priya Patel" },
+    { value: "6", label: "Dr. David Kim" },
+    { value: "7", label: "Dr. Rachel Thompson" },
+    { value: "8", label: "Dr. Marcus Brown" },
+    { value: "9", label: "Dr. Sofia Garcia" },
+    { value: "10", label: "Dr. William Lee" }
+  ];
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,8 +65,8 @@ const AppointmentForm = () => {
       newErrors.date = "Cannot book appointment for past dates";
     }
 
-    if (formData.department === "0") {
-      newErrors.department = "Please select a department";
+    if (formData.doctor === "0") {
+      newErrors.doctor = "Please select a doctor";
     }
 
     if (!formData.contact) {
@@ -98,9 +114,8 @@ const AppointmentForm = () => {
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your name"
-              className={`block w-full bg-white rounded-lg border ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
-              } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`block w-full bg-white rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
           </div>
@@ -116,9 +131,8 @@ const AppointmentForm = () => {
               name="date"
               value={formData.date}
               onChange={handleChange}
-              className={`block w-full bg-white rounded-lg border ${
-                errors.date ? 'border-red-500' : 'border-gray-300'
-              } py-2.5 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`block w-full bg-white rounded-lg border ${errors.date ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errors.date && <p className="text-xs text-red-500">{errors.date}</p>}
           </div>
@@ -127,15 +141,14 @@ const AppointmentForm = () => {
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-800">
               <FaStethoscope className="w-4 h-4 text-blue-500 mr-2" />
-              Department
+              Department (optional)
             </label>
             <select
               name="department"
               value={formData.department}
               onChange={handleChange}
-              className={`block w-full bg-white rounded-lg border ${
-                errors.department ? 'border-red-500' : 'border-gray-300'
-              } py-2.5 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`block w-full bg-white rounded-lg border ${errors.department ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
               {deptData.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -144,6 +157,27 @@ const AppointmentForm = () => {
               ))}
             </select>
             {errors.department && <p className="text-xs text-red-500">{errors.department}</p>}
+          </div>
+          {/* Doctor Name Field */}
+          <div className="space-y-2">
+            <label className="flex items-center text-sm font-semibold text-gray-800">
+              <FaStethoscope className="w-4 h-4 text-blue-500 mr-2" />
+              Doctor Name
+            </label>
+            <select
+              name="doctor"
+              value={formData.doctor}
+              onChange={handleChange}
+              className={`block w-full bg-white rounded-lg border ${errors.doctor ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            >
+              {doctorData.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {errors.doctor && <p className="text-xs text-red-500">{errors.doctor}</p>}
           </div>
 
           {/* Contact Number Field */}
@@ -158,9 +192,8 @@ const AppointmentForm = () => {
               value={formData.contact}
               onChange={handleChange}
               placeholder="Enter 10-digit number"
-              className={`block w-full bg-white rounded-lg border ${
-                errors.contact ? 'border-red-500' : 'border-gray-300'
-              } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`block w-full bg-white rounded-lg border ${errors.contact ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errors.contact && <p className="text-xs text-red-500">{errors.contact}</p>}
           </div>
@@ -178,9 +211,8 @@ const AppointmentForm = () => {
               onChange={handleChange}
               placeholder="Enter 6-digit pincode"
               maxLength="6"
-              className={`block w-full bg-white rounded-lg border ${
-                errors.pincode ? 'border-red-500' : 'border-gray-300'
-              } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`block w-full bg-white rounded-lg border ${errors.pincode ? 'border-red-500' : 'border-gray-300'
+                } py-2.5 px-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
             {errors.pincode && <p className="text-xs text-red-500">{errors.pincode}</p>}
           </div>

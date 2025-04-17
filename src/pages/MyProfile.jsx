@@ -76,11 +76,11 @@ const MyProfile = () => {
 
       {/* Name Field */}
       <div>
-        <label className="block font-medium text-3xl text-[#262626] mt-4 text-xl">
+        <label className="block font-medium text-3xl text-[#262626] mt-4">
           Name
         </label>
         <input
-          className="bg-gray-50 text-3xl font-medium max-w-60 w-full text-xl"
+          className="bg-gray-50 text-3xl font-medium max-w-60 w-full"
           type="text"
           placeholder="Enter your name"
           disabled={!isEdit}
