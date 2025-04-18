@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import DoctorSelector from "./Doctor";
-import SlotBooking from "./Appointment";
 
 const API_URL = "http://localhost:4000";
 const socket = io(API_URL);
@@ -13,6 +12,39 @@ function AppointmentHandler() {
   const [selectedSlot, setSelectedSlot] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [step, setStep] = useState(1);
+  const [allSlots, setAllSlots] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState([]);
+
+  useEffect(() => {
+    // Listen for slot updates
+    socket.on('slot-update', (data) => {
+      if (selectedDoctor && data.doctorId === selectedDoctor._id) {
+        setAllSlots(data.allSlots);
+        setBookedSlots(data.bookedSlots);
+      }
+    });
+
+    return () => {
+      socket.off('slot-update');
+    };
+  }, [selectedDoctor]);
+
+  useEffect(() => {
+    if (selectedDoctor) {
+      // Fetch initial slots data
+      fetchDoctorSlots();
+    }
+  }, [selectedDoctor]);
+
+  const fetchDoctorSlots = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/doctors/${selectedDoctor._id}/slots`);
+      setAllSlots(response.data.allSlots);
+      setBookedSlots(response.data.bookedSlots);
+    } catch (error) {
+      console.error('Error fetching slots:', error);
+    }
+  };
 
   const handleBooking = async () => {
     if (!selectedDoctor || !selectedDate || !selectedSlot || !patientName) {
@@ -20,26 +52,23 @@ function AppointmentHandler() {
       return;
     }
 
-    const formattedDate = new Date(selectedDate).toISOString().split("T")[0];
-
     try {
-      const response = await axios.post(`${API_URL}/api/bookings`, {
-        doctorId: selectedDoctor._id,
-        patientName,
-        date: formattedDate,
-        time: selectedSlot,
+      const response = await axios.put(`${API_URL}/api/doctors/${selectedDoctor._id}/book`, {
+        date: selectedDate,
+        slot: selectedSlot,
       });
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         alert("Slot booked successfully");
-        // Reset form and go back to doctor selection
-        handleBack();
+        // Update local state with new booking data
+        setBookedSlots(response.data.bookedSlots);
+        // Reset selection
+        setSelectedSlot("");
       } else {
         alert("Failed to book slot");
       }
     } catch (error) {
       console.error("Booking error:", error);
-      // Show more detailed error message
       alert(error.response?.data?.message || "Failed to book slot. Please try again.");
     }
   };
@@ -50,6 +79,37 @@ function AppointmentHandler() {
     setPatientName("");
     setSelectedSlot("");
     setSelectedDate("");
+    setAllSlots([]);
+    setBookedSlots([]);
+  };
+
+  const isSlotBooked = (slot) => {
+    return bookedSlots.some(bookedSlot => 
+      bookedSlot.date === selectedDate && bookedSlot.slot === slot
+    );
+  };
+
+  // Get slot status and styling
+  const getSlotStatus = (slot) => {
+    const booked = isSlotBooked(slot);
+    const selected = slot === selectedSlot;
+    
+    if (booked) {
+      return {
+        className: "bg-gray-100 text-gray-400 hover:cursor-not-allowed",
+        label: "Booked"
+      };
+    } else if (selected) {
+      return {
+        className: "bg-blue-500 text-white",
+        label: "Available"
+      };
+    } else {
+      return {
+        className: "bg-blue-50 text-blue-600 hover:bg-blue-100",
+        label: "Available"
+      };
+    }
   };
 
   return (
@@ -106,16 +166,63 @@ function AppointmentHandler() {
               }}
             />
           ) : (
-            <SlotBooking
-              doctor={selectedDoctor}
-              patientName={patientName}
-              setPatientName={setPatientName}
-              selectedSlot={selectedSlot}
-              setSelectedSlot={setSelectedSlot}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              onBook={handleBooking}
-            />
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">Book Appointment with Dr. {selectedDoctor.name}</h3>
+              
+              {/* Patient Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                <input
+                  type="text"
+                  value={patientName}
+                  onChange={(e) => setPatientName(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                  placeholder="Enter patient name"
+                />
+              </div>
+
+              {/* Date Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+
+              {/* Time Slots */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Time Slots</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {allSlots.map((slot) => {
+                    const { className, label } = getSlotStatus(slot);
+                    return (
+                      <button
+                        key={slot}
+                        onClick={() => !isSlotBooked(slot) && setSelectedSlot(slot)}
+                        disabled={isSlotBooked(slot)}
+                        className={`p-2 rounded-md text-center transition-colors ${className}`}
+                      >
+                        <div className="text-sm font-medium">{slot}</div>
+                        <div className="text-xs">{label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Book Button */}
+              <button
+                onClick={handleBooking}
+                disabled={!selectedSlot || !selectedDate || !patientName}
+                className="w-full bg-blue-500 text-white py-3 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Book Appointment
+              </button>
+            </div>
           )}
         </div>
       </div>
