@@ -1,44 +1,57 @@
-import React from 'react'
-import { assets } from '../assets/assets'
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 
 const Footer = () => {
   return (
-    <div className='md:mx-10'>
-      <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10  mt-40 text-sm'>
+    <div className='md:mx-10 px-6 md:px-0'>
 
+      {/* Footer Grid */}
+      <div className='flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm'>
+
+        {/* Logo + Description */}
         <div>
-          <img className='mb-3 w-24' src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Hinduja_Group_Logo.svg/1200px-Hinduja_Group_Logo.svg.png"
- alt="" />
-          <p className='w-full md:w-2/3 text-gray-600 leading-6'>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+          <img
+            className='mb-4 w-28'
+            src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Hinduja_Group_Logo.svg/1200px-Hinduja_Group_Logo.svg.png"
+            alt="Hinduja Logo"
+          />
+          <p className='w-full md:w-2/3 text-gray-600 leading-6'>
+            Hinduja simplifies the healthcare journey by providing a seamless way to book appointments, manage records, and access trusted healthcare professionals — all from one platform.
+          </p>
         </div>
 
+        {/* Company Links */}
         <div>
-          <p className='text-xl font-medium mb-5'>COMPANY</p>
+          <p className='text-xl font-semibold mb-5 text-gray-800'>Company</p>
           <ul className='flex flex-col gap-2 text-gray-600'>
-            <li>Home</li>
-            <li>About us</li>
-            <li>Delivery</li>
-            <li>Privacy policy</li>
+            <li className='cursor-pointer hover:text-blue-600 transition'><Link to={'/'} >Home</Link></li>
+            <li className='cursor-pointer hover:text-blue-600 transition'><Link to={'/about'} >About Us</Link></li>
+            <li className='cursor-pointer hover:text-blue-600 transition'><Link to={'/services'} >Services</Link></li>
+            <li className='cursor-pointer hover:text-blue-600 transition'><Link to={'/privacy-policy'} >Privacy Policy</Link></li>
           </ul>
         </div>
 
+        {/* Contact Info */}
         <div>
-          <p className='text-xl font-medium mb-5'>GET IN TOUCH</p>
+          <p className='text-xl font-semibold mb-5 text-gray-800'>Get in Touch</p>
           <ul className='flex flex-col gap-2 text-gray-600'>
-            <li>+1-212-456-7890</li>
-            <li>prescripto@gmail.com</li>
+            <li className='hover:text-blue-600 transition'>📞 +1 (212) 456-7890</li>
+            <li className='hover:text-blue-600 transition'>📧 contact@hindujahealth.com</li>
           </ul>
         </div>
-
       </div>
 
+      {/* Footer Bottom */}
       <div>
-        <hr />
-        <p className='py-5 text-sm text-center'>Copyright 2025 @HealthFirst - All Right Reserved.</p>
+        <hr className='border-gray-300' />
+        <p className='py-5 text-sm text-center text-gray-500'>
+          © 2025 Hinduja Health — All Rights Reserved.
+        </p>
       </div>
-
+      
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
