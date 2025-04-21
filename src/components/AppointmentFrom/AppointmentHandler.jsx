@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import DoctorSelector from "./Doctor";
 
-const API_URL = "http://localhost:4000";
+const API_URL = "https://hinduja-backend-production.up.railway.app";
 const socket = io(API_URL);
 
 function AppointmentHandler() {

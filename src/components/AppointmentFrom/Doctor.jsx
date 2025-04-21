@@ -9,7 +9,7 @@ const DoctorSelector = ({ setSelectedDoctor }) => {
   useEffect(() => {
     const fetchDoctorsData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/doctors');
+        const response = await axios.get('https://hinduja-backend-production.up.railway.app/api/doctors');
         setDoctorsData(response.data);
       } catch (error) {
         console.error('Error fetching doctors data:', error);
