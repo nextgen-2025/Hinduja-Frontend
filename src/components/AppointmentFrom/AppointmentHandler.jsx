@@ -54,16 +54,20 @@ function AppointmentHandler() {
 
     try {
       const response = await axios.put(`${API_URL}/api/doctors/${selectedDoctor._id}/book`, {
-        date: selectedDate,
-        slot: selectedSlot,
-        patientName: patientName,
-        doctorName: selectedDoctor
+        docId: selectedDoctor._id,
+        slotDate: selectedDate,
+        slotTime: selectedSlot,
+        patientName: patientName
       });
+      console.log(response);
+
 
       if (response.status === 200) {
         alert(response.data.message || "Slot booked successfully");
         // Update local state with new booking data
         setBookedSlots(response.data.bookedSlots);
+        console.log(allSlots);
+
         // Reset selection
         setSelectedSlot("");
         setPatientName("");
@@ -88,7 +92,7 @@ function AppointmentHandler() {
   };
 
   const isSlotBooked = (slot) => {
-    return bookedSlots.some(bookedSlot => 
+    return bookedSlots.some(bookedSlot =>
       bookedSlot.date === selectedDate && bookedSlot.slot === slot
     );
   };
@@ -97,7 +101,7 @@ function AppointmentHandler() {
   const getSlotStatus = (slot) => {
     const booked = isSlotBooked(slot);
     const selected = slot === selectedSlot;
-    
+
     if (booked) {
       return {
         className: "bg-gray-100 text-gray-400 hover:cursor-not-allowed",
@@ -131,13 +135,12 @@ function AppointmentHandler() {
             Back
           </button>
         )}
-        
+
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm ${
-                step === 1 ? 'bg-blue-600 text-white' : 'bg-green-500 text-white'
-              }`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm ${step === 1 ? 'bg-blue-600 text-white' : 'bg-green-500 text-white'
+                }`}>
                 1
               </div>
               <div className="ml-2 text-sm font-medium text-gray-700">Select Doctor</div>
@@ -146,9 +149,8 @@ function AppointmentHandler() {
               <div className={`h-full bg-blue-600 transition-all duration-300 ${step === 2 ? 'w-full' : 'w-0'}`} />
             </div>
             <div className="flex items-center">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm ${
-                step === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-              }`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm ${step === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                }`}>
                 2
               </div>
               <div className={`ml-2 text-sm font-medium ${step === 2 ? 'text-gray-700' : 'text-gray-400'}`}>
@@ -172,7 +174,7 @@ function AppointmentHandler() {
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Book Appointment with Dr. {selectedDoctor.name}</h3>
-              
+
               {/* Patient Name */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
