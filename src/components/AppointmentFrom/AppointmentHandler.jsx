@@ -173,7 +173,7 @@ function AppointmentHandler() {
             />
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">Book Appointment with Dr. {selectedDoctor.name}</h3>
+              <h3 className="text-lg font-semibold mb-4">Book Appointment with{selectedDoctor.name}</h3>
 
               {/* Patient Name */}
               <div className="mb-4">
