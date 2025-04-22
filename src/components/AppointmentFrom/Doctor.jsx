@@ -96,7 +96,7 @@ const DoctorSelector = ({ setSelectedDoctor }) => {
       </div>
 
       {/* Doctors List */}
-      <div className="max-h-[360px] overflow-y-auto pr-1">
+      <div className="max-h-[360px] pr-1">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {Object.entries(doctorsBySpecialty)
             .filter(([specialty]) =>

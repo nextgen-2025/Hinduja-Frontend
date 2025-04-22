@@ -88,12 +88,12 @@ const Navbar = () => {
             showMenu ? "fixed w-full" : "h-0 w-0"
           } right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}
         >
-          <div className="flex items-center justify-between px-5 py-6">
-            <img src={assets.logo} className="w-36" alt="" />
+          <div className="flex items-center justify-between px-6 py-4">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Hinduja_Group_Logo.svg/1200px-Hinduja_Group_Logo.svg.png" className="w-12" alt="Hinduja_logo" />
             <img
               onClick={() => setShowMenu(false)}
               src={assets.cross_icon}
-              className="w-7"
+              className="w-8"
               alt=""
             />
           </div>
