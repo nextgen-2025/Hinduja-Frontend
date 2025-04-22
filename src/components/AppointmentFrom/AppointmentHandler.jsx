@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import DoctorSelector from "./Doctor";
 
-const API_URL = "https://hinduja-backend-production.up.railway.app";
+const API_URL = process.env.NODE_ENV === 'development' ? "http://localhost:4000" : "https://hinduja-backend-production.up.railway.app";
 const socket = io(API_URL);
 
 function AppointmentHandler() {
@@ -56,14 +56,18 @@ function AppointmentHandler() {
       const response = await axios.put(`${API_URL}/api/doctors/${selectedDoctor._id}/book`, {
         date: selectedDate,
         slot: selectedSlot,
+        patientName: patientName,
+        doctorName: selectedDoctor
       });
 
       if (response.status === 200) {
-        alert("Slot booked successfully");
+        alert(response.data.message || "Slot booked successfully");
         // Update local state with new booking data
         setBookedSlots(response.data.bookedSlots);
         // Reset selection
         setSelectedSlot("");
+        setPatientName("");
+        setSelectedDate("");
       } else {
         alert("Failed to book slot");
       }
