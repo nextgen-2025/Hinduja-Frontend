@@ -14,6 +14,8 @@ function AppointmentHandler() {
   const [step, setStep] = useState(1);
   const [allSlots, setAllSlots] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [queueInfo, setQueueInfo] = useState(null);
+  const [loadingQueue, setLoadingQueue] = useState(false);
 
   useEffect(() => {
     // Listen for slot updates
@@ -21,13 +23,18 @@ function AppointmentHandler() {
       if (selectedDoctor && data.doctorId === selectedDoctor._id) {
         setAllSlots(data.allSlots);
         setBookedSlots(data.bookedSlots);
+        
+        // If we have a selected date, refresh queue info
+        if (selectedDate) {
+          fetchQueueInfo(selectedDoctor._id, selectedDate);
+        }
       }
     });
 
     return () => {
       socket.off('slot-update');
     };
-  }, [selectedDoctor]);
+  }, [selectedDoctor, selectedDate]);
 
   useEffect(() => {
     if (selectedDoctor) {
@@ -36,6 +43,15 @@ function AppointmentHandler() {
     }
   }, [selectedDoctor]);
 
+  // Fetch queue information when date changes
+  useEffect(() => {
+    if (selectedDoctor && selectedDate) {
+      fetchQueueInfo(selectedDoctor._id, selectedDate);
+    } else {
+      setQueueInfo(null);
+    }
+  }, [selectedDate]);
+
   const fetchDoctorSlots = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/doctors/${selectedDoctor._id}/slots`);
@@ -43,6 +59,18 @@ function AppointmentHandler() {
       setBookedSlots(response.data.bookedSlots);
     } catch (error) {
       console.error('Error fetching slots:', error);
+    }
+  };
+
+  const fetchQueueInfo = async (doctorId, date) => {
+    try {
+      setLoadingQueue(true);
+      const response = await axios.get(`${API_URL}/api/doctors/${doctorId}/queue/${date}`);
+      setQueueInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching queue info:', error);
+    } finally {
+      setLoadingQueue(false);
     }
   };
 
@@ -67,6 +95,9 @@ function AppointmentHandler() {
         setBookedSlots(response.data.bookedSlots);
         console.log(allSlots);
 
+        // Refresh queue info
+        fetchQueueInfo(selectedDoctor._id, selectedDate);
+
         // Reset selection
         setSelectedSlot("");
         setPatientName("");
@@ -88,6 +119,7 @@ function AppointmentHandler() {
     setSelectedDate("");
     setAllSlots([]);
     setBookedSlots([]);
+    setQueueInfo(null);
   };
 
   const isSlotBooked = (slot) => {
@@ -172,7 +204,7 @@ function AppointmentHandler() {
             />
           ) : (
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">Book Appointment with{selectedDoctor.name}</h3>
+              <h3 className="text-lg font-semibold mb-4">Book Appointment with {selectedDoctor.name}</h3>
 
               {/* Patient Name */}
               <div className="mb-4">
@@ -197,6 +229,49 @@ function AppointmentHandler() {
                   className="w-full p-2 border rounded-md"
                 />
               </div>
+
+              {/* Queue Information */}
+              {selectedDate && (
+                <div className="mb-4 p-3 border rounded-md bg-gray-50">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Current Queue Status</h4>
+                  {loadingQueue ? (
+                    <div className="text-sm text-gray-500">Loading queue information...</div>
+                  ) : queueInfo ? (
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Total Patients: {queueInfo.totalPatients}</span>
+                        <span className="text-xs text-gray-500">{selectedDate}</span>
+                      </div>
+                      {queueInfo.queue.length > 0 ? (
+                        <div className="max-h-32 overflow-y-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="py-1 text-left">Position</th>
+                                <th className="py-1 text-left">Patient</th>
+                                <th className="py-1 text-left">Time</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {queueInfo.queue.map((patient) => (
+                                <tr key={patient.position} className="border-b border-gray-100">
+                                  <td className="py-1">{patient.position}</td>
+                                  <td className="py-1">{patient.patientName}</td>
+                                  <td className="py-1">{patient.time}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">No patients in queue for this date</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500">No queue information available</div>
+                  )}
+                </div>
+              )}
 
               {/* Time Slots */}
               <div className="mb-4">
