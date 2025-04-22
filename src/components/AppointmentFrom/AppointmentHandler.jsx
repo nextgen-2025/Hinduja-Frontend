@@ -55,12 +55,11 @@ function AppointmentHandler() {
     try {
       const response = await axios.put(`${API_URL}/api/doctors/${selectedDoctor._id}/book`, {
         docId: selectedDoctor._id,
-        slotDate: selectedDate,
-        slotTime: selectedSlot,
-        patientName: patientName
+        date: selectedDate,
+        patientName: patientName,
+        slot: selectedSlot
       });
       console.log(response);
-
 
       if (response.status === 200) {
         alert(response.data.message || "Slot booked successfully");
