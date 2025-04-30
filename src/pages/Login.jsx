@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [state, setState] = useState("Sign Up");
-
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,32 +16,79 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    if (state === "Sign Up") {
-      const { data } = await axios.post(backendUrl + "/api/user/register", {
-        name,
-        email,
-        password,
-      });
+    try {
+      if (state === "Sign Up") {
+        const currentYear = new Date().getFullYear();
+        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const patientId = `HIN-${currentYear}-${randomNum}`;
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        setToken(data.token);
+        try {
+          const { data } = await axios.post(backendUrl + "/api/user/register", {
+            name,
+            email,
+            password,
+            patientId
+          });
+
+          if (data.success) {
+            toast.success("Registration successful! Please login.");
+            setState("Login");
+            setName("");
+            setEmail("");
+            setPassword("");
+          } else {
+            // Check if the error is due to duplicate email
+            if (data.message && data.message.includes('duplicate key')) {
+              toast.info("Account already exists! Please login.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+              });
+              setState("Login");
+              setPassword("");
+            } else {
+              toast.error("Registration failed. Please try again.");
+            }
+          }
+        } catch (err) {
+          if (err.response?.data?.message?.includes('duplicate key')) {
+            toast.info("Account already exists! Please login.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            });
+            setState("Login");
+            setPassword("");
+          } else {
+            toast.error("Registration failed. Please try again.");
+          }
+        }
       } else {
-        toast.error(data.message);
-      }
-    } else {
-      const { data } = await axios.post(backendUrl + "/api/user/login", {
-        email,
-        password,
-      });
+        const { data } = await axios.post(backendUrl + "/api/user/login", {
+          email,
+          password,
+        });
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        setToken(data.token);
-      } else {
-        toast.error(data.message);
+        if (data.success) {
+          localStorage.setItem("token", data.token);
+          setToken(data.token);
+          toast.success("Login successful!");
+        } else {
+          toast.error(data.message);
+        }
       }
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,8 +150,18 @@ const Login = () => {
             </div>
           )}
         </div>
-        <button className="bg-primary text-white w-full py-2 my-2 rounded-md text-base">
-          {state === "Sign Up" ? "Create account" : "Login"}
+        <button 
+          disabled={loading}
+          className="bg-primary text-white w-full py-2 my-2 rounded-md text-base relative"
+        >
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              {state === "Sign Up" ? "Creating account..." : "Logging in..."}
+            </div>
+          ) : (
+            state === "Sign Up" ? "Create account" : "Login"
+          )}
         </button>
         {state === "Sign Up" ? (
           <p>
