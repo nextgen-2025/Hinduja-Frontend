@@ -116,6 +116,7 @@ const Notifications = () => {
         isRead: apt.isRead || false,
         doctorId: apt.doctorId,
         date: new Date(apt.createdAt),
+        date: apt.date,
         time: apt.time,
         createdAt: apt.createdAt
       }));
@@ -208,9 +209,13 @@ const Notifications = () => {
                         {notification.type === 'memo' ? 'Visit Memo' : 'New Appointment'}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {notification.type === 'memo' 
-                          ? new Date(notification.createdAt).toLocaleString()
-                          : `${new Date(notification.date).toLocaleString()}`
+                        {notification.type === 'appointment' 
+                          ? `Slot Timings: ${new Date(notification.date).toLocaleDateString('en-US', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })} at ${notification.time}`
+                          : null
                         }
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
