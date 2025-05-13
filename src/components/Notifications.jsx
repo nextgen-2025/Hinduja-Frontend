@@ -209,6 +209,12 @@ const Notifications = () => {
                         {notification.type === 'memo' ? 'Visit Memo' : 'New Appointment'}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
+                        {notification.type === 'memo' 
+                          ? new Date(notification.createdAt).toLocaleString()
+                          : `${new Date(notification.date).toLocaleString()}`
+                        }
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
                         {notification.type === 'appointment' 
                           ? `Slot Timings: ${new Date(notification.date).toLocaleDateString('en-US', {
                               day: 'numeric',
